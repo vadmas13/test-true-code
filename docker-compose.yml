@@ -1,0 +1,43 @@
+# Use postgres/example user/password credentials
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_container
+    build: ./backend/docker/postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-root}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-12345}
+      POSTGRES_DB: ${POSTGRES_DB:-test_true_code_db}
+      PGDATA: ${PGDATA:-/data/postgres}
+    volumes:
+      - postgres:${PGDATA:-/data/postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  api:
+    container_name: api
+    build:
+      context: ./backend 
+      dockerfile: Dockerfile
+    environment:
+      BASE_URL: "http://localhost:3001/api"
+      DATABASE_URL: "postgresql://root:12345@postgres:5432/test_true_code_db"  
+      NODE_ENV: "development"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:

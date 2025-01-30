@@ -1,0 +1,47 @@
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "debian-openssl-3.0.x", "rhel-openssl-1.1.x"]
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+view ProductAttributes {
+  product_id String @id @default(uuid()) @map("product_id")
+  minPrice   Int    @map("min_price")
+  maxPrice   Int    @map("max_price")
+
+  @@map("product_attributes")
+}
+
+model Product {
+  id              String   @id @default(uuid())
+  name            String   @db.VarChar(50)
+  description     String?  @db.VarChar(2000)
+  price           Int
+  discountedPrice Int?     @map("discounted_price")
+  article         Int
+  photoBytes      Bytes?   @map("photo_bytes")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("product")
+}
+
+view ProductView {
+  id              String   @id @default(uuid()) @map("id")
+  name            String   @map("name") @db.VarChar(50)
+  description     String?  @map("description") @db.VarChar(2000)
+  price           Int      @map("price")
+  discountedPrice Int?     @map("discounted_price")
+  article         Int      @map("article")
+  photoBytes      Bytes?   @map("photo_bytes")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  minPrice        Int      @map("min_price")
+
+  @@map("product_view")
+}
